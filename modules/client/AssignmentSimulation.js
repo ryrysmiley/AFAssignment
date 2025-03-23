@@ -12,36 +12,35 @@ class CadetAssignment {
 
         // Initialize the LP problem
         this.lp = this.InitializeLP();
-
-    }
-    constructor(cadetHashSet, afscHashSet, deviationPenalty) {
-        this.cadetData = cadetHashSet; // all cadets in dictionary
-        this.afscData = afscHashSet; // all afscs in dictionary
-        this.deviationPenalty = deviationPenalty; // penalty for not meeting requirments
-
-        // Initialize the LP problem
-        this.lp = this.InitializeLP();
     }
 
     // Function: Utility Calculation of every cadet afsc pair
     GetUtility(cadet, afsc) {
         const CadetPercentile = this.cadetData[cadet].cadetPercentile; // Cadet percentile
-        const CadetPrefernceRanking = this.cadetData[cadet].cadetPreferences[afsc]; // Preference score
+        const CadetPreferenceRanking = this.cadetData[cadet].cadetPreferences[afsc]; // Preference score
         const CadetDegree = this.cadetData[cadet].cadetDegrees[afsc]; // Degree requirement
 
         // Calculate utility based on degree requirements and preferences
-        if (mandatory === 1 && wc > 0) {
-            return (10 * rc * wc) + 250; // Mandatory degree + preference
-        } else if (mandatory === 0 && wc > 0) {
+        if (CadetDegree === DegreeEnum.MANDATORY && CadetPreferenceRanking !== null) {
+            return (10 * CadetPercentile * wc) + 250; // Mandatory degree + preference
+        } 
+        else if (CadetDegree === DegreeEnum.DESIRED && CadetPreferenceRanking !== null) {
             return (10 * rc * wc) + 150; // Desired degree + preference
-        } else if (wc > 0) {
-            return 10 * rc * wc; // Permitted degree + preference
-        } else if (mandatory === 1) {
-            return 100 * rc; // Mandatory degree but no preference
-        } else if (mandatory === 0) {
-            return 50 * rc; // Desired degree but no preference
-        } else {
-            return this.penaltyIneligible; // Penalize ineligible assignments
+        } 
+        else if (CadetDegree === DegreeEnum.PERMITTED && CadetPreferenceRanking !== null) {
+            return 10 * CadetPercentile * wc; // Permitted degree + preference
+        } 
+        else if (CadetDegree === DegreeEnum.MANDATORY) {
+            return 100 * CadetPercentile; // Mandatory degree but no preference
+        } 
+        else if (CadetDegree === DegreeEnum.DESIRED) {
+            return 50 * CadetPercentile; // Desired degree but no preference
+        }
+        else if (CadetDegree === DegreeEnum.PERMITTED) {
+            return 0; // Permitted degree but no preference
+        } 
+        else {
+            return this.deviationPenalty; // Penalize ineligible assignments
         }
     }
 
