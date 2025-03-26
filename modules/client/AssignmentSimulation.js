@@ -203,13 +203,31 @@ export class CadetAssignment {
 
     // Function: Display Results
     DisplayResults(vars) {
+        let results = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, "Not preferred": 0};
         Object.keys(this.cadetData).forEach(cadet => {
             Object.keys(this.afscData).forEach(afsc => {
                 let varName = `${cadet}_${afsc}`;
                 if (vars[varName] === 1) {
                     console.log(`${cadet} assigned to ${afsc}`);
+                    if(this.cadetData[cadet].cadetPreferences !== null){
+                        if(this.cadetData[cadet].cadetPreferences[afsc])
+                        {
+                            results[this.cadetData[cadet].cadetPreferences[afsc]] += 1;
+                        }
+                        else
+                        {
+                            results["Not preferred"] += 1;
+                        }
+                    }
                 }
             });
         });
+        console.log('1st preference:', results[1]);
+        console.log('2nd preference:', results[2]);
+        console.log('3rd preference:', results[3]);
+        console.log('4th preference:', results[4]);
+        console.log('5th preference:', results[5]);
+        console.log('6th preference:', results[6]);
+        console.log('Not preferred:', results["Not preferred"]);
     }
 }
