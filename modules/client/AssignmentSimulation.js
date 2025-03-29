@@ -124,8 +124,8 @@ export class CadetAssignment {
                 vars: [],
                 bnds: {
                     type: this.glpkInstance.GLP_LO,
-                    lb: afscInfo.target * afscInfo.mandatoryDegreeBounds.lower,
-                    ub: afscInfo.target * afscInfo.mandatoryDegreeBounds.upper
+                    lb: afscInfo.target * afscInfo.mandatoryDegreeBounds.min,
+                    ub: afscInfo.target * afscInfo.mandatoryDegreeBounds.max
                 }
             };
             Object.keys(this.cadetData).forEach(cadet => {

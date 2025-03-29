@@ -65,25 +65,28 @@ const cadetData = {
 // === Sample AFSCs ===
 const afscData = {
     afsc1: new AFSC(
+        "afsc1", // Code of the AFSC
         2, // Minimum of 2 cadets assigned
         1.2, // Can overclassify by 20%
-        { lower: 0, upper: 1 }, // 40-80% mandatory degree bounds
+        { min: 0, max: 1 }, // 40-80% mandatory degree bounds
         { min: 0, max: 1 }, // 20-50% USAFA cadets bounds
         { min: 0, max: 1 } // 30-70% merit bounds
     ),
     afsc2: new AFSC(
+        "afsc2", // Code of the AFSC
         1, // Minimum of 1 cadet assigned
         1.1, // Can overclassify by 10%
-        { lower: 0, upper: 1 }, // 40-80% mandatory degree bounds
+        { min: 0, max: 1 }, // 40-80% mandatory degree bounds
         { min: 0, max: 1 }, // 20-50% USAFA cadets bounds
-        { min: 0, max: 1 } // 30-70% merit bounds
+        { min: 0, max: 0.5 } // 30-70% merit bounds
     ),
     afsc3: new AFSC(
+        "afsc3", // Code of the AFSC
         1, // Minimum of 1 cadet assigned
         1.3, // Can overclassify by 30%
-        { lower: 0, upper: 1 }, // 40-80% mandatory degree bounds
+        { min: 0, max: 1 }, // 40-80% mandatory degree bounds
         { min: 0, max: 1 }, // 20-50% USAFA cadets bounds
-        { min: 0, max: 1 } // 30-70% merit bounds
+        { min: 0.7, max: 1 } // 30-70% merit bounds
     )
 };
 
