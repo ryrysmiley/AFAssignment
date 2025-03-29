@@ -31,7 +31,7 @@ export default function Home() {
                 onClick={() => setSelectedTab("afsc-editor")}
                 className={`py-2 px-4 rounded-md ${selectedTab === "afsc-editor" ? "bg-[#FF746C]" : "hover:bg-[#FF746C]"} `}
               >
-                AFSC Editor
+                Air Force Specialty Code Editor
               </button>
             </li>
             {/* Cadet Editor Tab */}
@@ -61,7 +61,7 @@ export default function Home() {
         {/* Home Content */}
         {selectedTab === "home" && (
           <div>
-            <h1 className="text-3xl font-bold text-gray-800 mb-4">Welcome to the USAF Assignment Mechanism Simulation Tool</h1>
+            <h1 className="text-3xl font-bold text-gray-800 mb-4">Welcome to the USAF assignment mechanism simulation tool</h1>
             <p className="text-lg text-gray-600">
               This is the home page. You can navigate between different sections using the menu above. Refreshing the site will remove all progress.
             </p>

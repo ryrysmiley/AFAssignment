@@ -1,8 +1,11 @@
+
+
 export function CadetEditor({cadets, setCadets}) {
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 15;  // You can change this to adjust how many rows per page.
     return (
         <div>
-            <h1>Cadet Editor</h1>
-            <p>This is the cadet editor page.</p>
+            
         </div>
     );
 }

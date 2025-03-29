@@ -5,6 +5,7 @@ import { DegreeEnum } from '../models/DegreeEnum.js';
 import { CadetAssignment } from '../client/AssignmentSimulation.js';
 const cadetData = {
     cadet1: new Cadet(
+        "Cadet 1",
         {
             afsc1: 1, // Top choice
             afsc2: 2,
@@ -19,6 +20,7 @@ const cadetData = {
         }
     ),
     cadet2: new Cadet(
+        "Cadet 2",
         {
             afsc1: 2,
             afsc2: 1, // Top choice
@@ -33,6 +35,7 @@ const cadetData = {
         }
     ),
     cadet3: new Cadet(
+        "Cadet 3",
         {
             afsc1: 3,
             afsc2: 1,
@@ -47,6 +50,7 @@ const cadetData = {
         }
     ),
     cadet4: new Cadet(
+        "Cadet 4",
         {
             afsc1: 1,
             afsc2: 2,

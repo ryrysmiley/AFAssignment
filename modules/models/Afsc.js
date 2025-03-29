@@ -9,7 +9,7 @@ export class AFSC {
         this.weightedDistribution = 0; // weighted distribution of cadets wanting this AFSC
     }
 
-    // Static method to create an AFSC object from a CSV row
+    // Create an AFSC object from a CSV row
     static fromCSV(row) {
         return new AFSC(
             row.afsc, 

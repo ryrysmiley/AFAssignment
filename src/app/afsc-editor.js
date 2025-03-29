@@ -95,6 +95,8 @@ export default function AfscEditor({ afscs, setAfscs }) {
 
     return (
         <div className="p-6">
+            <h1 className="text-2xl font-bold mb-1">AFSC Editor</h1>
+            <p className="mb-4 text-gray-600">Manage the Air Force Specialty Codes (AFSCs) and their parameters.</p>
             <div className="mb-4 flex">
                 <div className="me-4">
                     <label className="block mb-2 text-sm font-medium text-gray-600">
