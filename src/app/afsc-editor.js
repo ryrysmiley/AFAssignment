@@ -143,7 +143,8 @@ export default function AfscEditor({ afscs, setAfscs }) {
                     </button>
                 </div>
             </div>
-            <div className="mb-4">
+            
+            <div className="overflow-x-auto mb-4">
                 <table className="table-auto w-full border-collapse border border-gray-300">
                     <thead>
                         <tr className="bg-red-700 text-white">
@@ -176,7 +177,7 @@ export default function AfscEditor({ afscs, setAfscs }) {
                                         type="text"
                                         value={afsc.afsc}
                                         onChange={(e) => updateAFSCValue(index, "afsc", e.target.value)}
-                                        className="p-2 text-sm border border-gray-300 rounded-md"
+                                        className="p-2 text-sm border border-gray-300 rounded-md box-border"
                                     />
                                 </td>
                                 <td className="px-4 py-2">
@@ -184,7 +185,7 @@ export default function AfscEditor({ afscs, setAfscs }) {
                                         type="number"
                                         value={afsc.target}
                                         onChange={(e) => updateAFSCValue(index, "target", isNaN(e.target.value) ? 0 : parseInt(e.target.value))}
-                                        className="p-2 text-sm border border-gray-300 rounded-md"
+                                        className="p-2 text-sm border border-gray-300 rounded-md box-border"
                                     />
                                 </td>
                                 <td className="px-4 py-2">
@@ -192,7 +193,7 @@ export default function AfscEditor({ afscs, setAfscs }) {
                                         type="number"
                                         value={afsc.overclassFactor}
                                         onChange={(e) => updateAFSCValue(index, "overclassFactor", parseFloat(e.target.value))}
-                                        className="p-2 text-sm border border-gray-300 rounded-md"
+                                        className="p-2 text-sm border border-gray-300 rounded-md box-border"
                                     />
                                 </td>
                                 <td className="px-4 py-2">
@@ -201,14 +202,14 @@ export default function AfscEditor({ afscs, setAfscs }) {
                                             type="number"
                                             value={afsc.mandatoryDegreeBounds.min}
                                             onChange={(e) => updateAFSCValue(index, "mandatoryDegreeBounds.min", parseFloat(e.target.value))}
-                                            className="p-2 text-sm border border-gray-300 rounded-md"
+                                            className="p-2 text-sm border border-gray-300 rounded-md box-border"
                                         />
                                         <span>-</span>
                                         <input
                                             type="number"
                                             value={afsc.mandatoryDegreeBounds.max}
                                             onChange={(e) => updateAFSCValue(index, "mandatoryDegreeBounds.max", parseFloat(e.target.value))}
-                                            className="p-2 text-sm border border-gray-300 rounded-md"
+                                            className="p-2 text-sm border border-gray-300 rounded-md box-border"
                                         />
                                     </div>
                                 </td>
@@ -218,14 +219,14 @@ export default function AfscEditor({ afscs, setAfscs }) {
                                             type="number"
                                             value={afsc.usaCadetBounds.min}
                                             onChange={(e) => updateAFSCValue(index, "usaCadetBounds.min", parseFloat(e.target.value))}
-                                            className="p-2 text-sm border border-gray-300 rounded-md"
+                                            className="p-2 text-sm border border-gray-300 rounded-md box-border"
                                         />
                                         <span>-</span>
                                         <input
                                             type="number"
                                             value={afsc.usaCadetBounds.max}
                                             onChange={(e) => updateAFSCValue(index, "usaCadetBounds.max", parseFloat(e.target.value))}
-                                            className="p-2 text-sm border border-gray-300 rounded-md"
+                                            className="p-2 text-sm border border-gray-300 rounded-md box-border"
                                         />
                                     </div>
                                 </td>
@@ -235,14 +236,14 @@ export default function AfscEditor({ afscs, setAfscs }) {
                                             type="number"
                                             value={afsc.meritBounds.min}
                                             onChange={(e) => updateAFSCValue(index, "meritBounds.min", parseFloat(e.target.value))}
-                                            className="p-2 text-sm border border-gray-300 rounded-md"
+                                            className="p-2 text-sm border border-gray-300 rounded-md box-border"
                                         />
                                         <span>-</span>
                                         <input
                                             type="number"
                                             value={afsc.meritBounds.max}
                                             onChange={(e) => updateAFSCValue(index, "meritBounds.max", parseFloat(e.target.value))}
-                                            className="p-2 text-sm border border-gray-300 rounded-md"
+                                            className="p-2 text-sm border border-gray-300 rounded-md box-border"
                                         />
                                     </div>
                                 </td>
@@ -252,7 +253,7 @@ export default function AfscEditor({ afscs, setAfscs }) {
                                             type="number"
                                             value={afsc.weightedDistribution}
                                             onChange={(e) => updateAFSCValue(index, "weightedDistribution", parseFloat(e.target.value))}
-                                            className="p-2 text-sm border border-gray-300 rounded-md"
+                                            className="p-2 text-sm border border-gray-300 rounded-md box-border"
                                         />
                                     </div>
                                 </td>
@@ -266,25 +267,25 @@ export default function AfscEditor({ afscs, setAfscs }) {
                     </tbody>
                 </table>
             </div>
-
-            {/* Pagination Controls */}
-            <div className="flex justify-between items-center mb-4">
-                <button
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                    disabled={currentPage === 1 || afscs.length === 0}
-                    className="p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 hover:bg-gray-200 focus:outline-none"
-                >
-                    Previous
-                </button>
-                <span className="text-gray-700">{`Page ${currentPage} of ${totalPages}`}</span>
-                <button
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                    disabled={currentPage === totalPages || afscs.length === 0}
-                    className="p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 hover:bg-gray-200 focus:outline-none"
-                >
-                    Next
-                </button>
-            </div>
+            {afscs.length !== 0 &&
+                <div className="flex justify-between items-center mb-4">
+                    <button
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPage === 1 || afscs.length === 0}
+                        className="p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 hover:bg-gray-200 focus:outline-none disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                        Previous
+                    </button>
+                    <span className="text-gray-700">{`Page ${currentPage} of ${totalPages}`}</span>
+                    <button
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPage === totalPages || afscs.length === 0}
+                        className="p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700 hover:bg-gray-200 focus:outline-none disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    >
+                        Next
+                    </button>
+                </div>
+            }
         </div>
     );
 }
