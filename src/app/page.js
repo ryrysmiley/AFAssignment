@@ -1,7 +1,13 @@
+"use client";
+
+import AfscEditor from "./afsceditor";
+
 export default function Home() {
+
   return (
     <div>
-      Test
+      {/* Navigation list tabs */}
+      <AfscEditor />
     </div>
   );
 }

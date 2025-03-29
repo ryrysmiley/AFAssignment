@@ -18,7 +18,7 @@ export class AFSC {
             { min: parseFloat(row.mandatory_education_min), max: parseFloat(row.mandatory_education_max) }, 
             { min: parseFloat(row.usafa_bound_min), max: parseFloat(row.usafa_bound_max) }, 
             { min: parseFloat(row.merit_bound_min), max: parseFloat(row.merit_bound_max) }, 
-            parseFloat(row["weighted distribution"]) || 0
+            parseFloat(row.weighted_distribution) || 0
         );
     }
 }
