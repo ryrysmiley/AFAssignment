@@ -63,7 +63,7 @@ export default function Home() {
           <div>
             <h1 className="text-3xl font-bold text-gray-800 mb-4">Welcome to the USAF Assignment Mechanism Simulation Tool</h1>
             <p className="text-lg text-gray-600">
-              This is the home page. You can navigate between different sections using the menu above.
+              This is the home page. You can navigate between different sections using the menu above. Refreshing the site will remove all progress.
             </p>
           </div>
         )}
