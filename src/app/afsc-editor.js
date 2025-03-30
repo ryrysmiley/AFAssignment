@@ -1,6 +1,5 @@
-"use client";
 import { useState } from "react";
-import { importAFSCs } from "../../modules/client/CsvImportExport";
+import { importAFSCs } from "../../modules/client/ImportCsv";
 import * as XLSX from "xlsx";
 
 export default function AfscEditor({ afscs, setAfscs }) {
@@ -43,7 +42,6 @@ export default function AfscEditor({ afscs, setAfscs }) {
         const worksheet = XLSX.utils.json_to_sheet(formattedAFSCs);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "AFSCs");
-
         const fileName = "afscs.xlsx";
         XLSX.writeFile(workbook, fileName);
     }
@@ -97,10 +95,10 @@ export default function AfscEditor({ afscs, setAfscs }) {
         <div className="p-6">
             <h1 className="text-2xl font-bold mb-1">AFSC Editor</h1>
             <p className="mb-4 text-gray-600">Manage the Air Force Specialty Codes (AFSCs) and their parameters.</p>
-            <div className="mb-4 flex">
+            <div className="mb-6 flex">
                 <div className="me-4">
                     <label className="block mb-2 text-sm font-medium text-gray-600">
-                        Import AFSCs File (Will overwrite existing AFSCs)
+                        Import AFSCs file (Will overwrite existing AFSCs)
                     </label>
                     <input
                         type="file"
@@ -111,7 +109,7 @@ export default function AfscEditor({ afscs, setAfscs }) {
                 </div>
                 <div className="me-4">
                     <label className="block mb-2 text-sm font-medium text-gray-600">
-                        Export AFSCs to File
+                        Export AFSCs to file
                     </label>
                     <button
                         onClick={() => exportAFSCs(afscs)}
@@ -127,7 +125,7 @@ export default function AfscEditor({ afscs, setAfscs }) {
                     </label>
                     <button
                         onClick={addAFSC}
-                        className="mb-4 p-2 bg-red-700 text-white rounded-md hover:bg-red-800"
+                        className="p-2 bg-red-700 text-white rounded-md hover:bg-red-800"
                     >
                         Add AFSC
                     </button>

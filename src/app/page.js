@@ -1,5 +1,4 @@
 "use client";
-
 import { useState } from "react";
 import AfscEditor from "./afsc-editor";
 import { CadetEditor } from "./cadet-editor";
@@ -75,7 +74,7 @@ export default function Home() {
 
         {/* Cadet Editor Content */}
         {selectedTab === "cadet-editor" && (
-          <CadetEditor cadets={cadets} setCadets={setCadets} />
+          <CadetEditor cadets={cadets} setCadets={setCadets} afscs={afscs} />
         )}
 
         {/* Assignment Simulation Content */}
