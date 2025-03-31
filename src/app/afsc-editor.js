@@ -51,7 +51,6 @@ export default function AfscEditor({ afscs, setAfscs }) {
         if (isNaN(value) && key !== "afsc") {
             value = 0; // Default to 0 if the value is not a number
         }
-        console.log(value);
         const actualIndex = startIndex + index; // Correct index based on pagination
         const newAfscs = [...afscs];
         if (key.includes(".")) {

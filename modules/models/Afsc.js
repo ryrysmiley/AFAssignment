@@ -11,14 +11,15 @@ export class AFSC {
 
     // Create an AFSC object from a CSV row
     static fromCSV(row) {
-        return new AFSC(
+        const afsc = new AFSC(
             row.afsc, 
             parseInt(row.target), 
             parseFloat(row.overclass_factor), 
             { min: parseFloat(row.mandatory_education_min), max: parseFloat(row.mandatory_education_max) }, 
             { min: parseFloat(row.usafa_bound_min), max: parseFloat(row.usafa_bound_max) }, 
             { min: parseFloat(row.merit_bound_min), max: parseFloat(row.merit_bound_max) }, 
-            parseFloat(row.weighted_distribution) || 0
         );
+        afsc.weightedDistribution = parseFloat(row.weighted_distribution) || 0
+        return afsc;
     }
 }

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { importCadets } from "../../modules/client/ImportCsv";
 import { DegreeEnum } from "../../modules/models/DegreeEnum";
 import * as XLSX from "xlsx";
+import { GenerateCadets } from "../../modules/client/CadetGeneration";
 
 export function CadetEditor({cadets, setCadets, afscs}) {
     const [currentPage, setCurrentPage] = useState(1);
@@ -84,7 +85,11 @@ export function CadetEditor({cadets, setCadets, afscs}) {
         setCadets([...cadets, newCadet]); // Add the new cadet to the list
     }
 
-
+    // Create cadets based on afscs' properties
+    function CreateAFSCBasedCadets(){
+        const newCadets = GenerateCadets(afscs);
+        setCadets(newCadets)
+    }
 
     // Function to delete a cadet
     function deleteCadet(index) {
@@ -156,7 +161,8 @@ export function CadetEditor({cadets, setCadets, afscs}) {
                         Generate cadets from AFSCs' weighted distribution
                     </label>
                     <button
-                        disabled={afscs.length === 0}
+                        onClick={() => {CreateAFSCBasedCadets()}}
+                        disabled={afscs.length < 6}
                         className="p-2 bg-blue-700 text-white rounded-md hover:bg-blue-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
                     >
                         Generate Cadets
@@ -180,7 +186,7 @@ export function CadetEditor({cadets, setCadets, afscs}) {
                         {currentCadets.length === 0 && (
                             <tr>
                                 <td colSpan="8" className="text-center text-gray-500 py-4">
-                                    No Cadets created. Please add Cadets to get started.
+                                    No cadets created. Please add cadets to get started.
                                 </td>
                             </tr>
                         )}

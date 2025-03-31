@@ -79,7 +79,7 @@ export default function Home() {
 
         {/* Assignment Simulation Content */}
         {selectedTab === "assignment-simulation" && (
-          <AssignmentSimulation />
+          <AssignmentSimulation cadets={cadets} afscs={afscs} />
         )}
       </div>
     </div>

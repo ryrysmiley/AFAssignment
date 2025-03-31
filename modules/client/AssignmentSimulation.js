@@ -4,13 +4,18 @@ import glpk from 'glpk.js';
 // CadetAssignment Class
 export class CadetAssignment {
     // Class Constructor
-    constructor(cadetHashSet, afscHashSet, deviationPenalty) {
+    constructor(cadetHashSet, afscHashSet, deviationPenalty, glpk = null) {
         this.cadetData = cadetHashSet; // all cadets in dictionary
         this.afscData = afscHashSet; // all afscs in dictionary
         this.deviationPenalty = deviationPenalty; // penalty for not meeting requirements
         
         // glpk
-        this.glpkInstance = glpk();
+        if (glpk == null) {
+            this.glpkInstance = glpk();
+        }
+        else {
+            this.glpkInstance = glpk;
+        }
 
         // Initialize the LP problem
         this.lp = this.InitializeLP();
@@ -101,41 +106,68 @@ export class CadetAssignment {
         // Constraint: Ensure AFSC targets and overclassification limits
         Object.keys(this.afscData).forEach(afsc => {
             let afscInfo = this.afscData[afsc];
-            let constraint = {
-                name: `Target_${afsc}`,
+
+            // Set lower bound as the target
+            let constraintLower = {
+                name: `Target_Lower_${afsc}`,
                 vars: [],
-                bnds: {
-                    type: this.glpkInstance.GLP_LO,
-                    lb: afscInfo.target,
-                    ub: afscInfo.target * afscInfo.overclassFactor
-                }
+                bnds: { type: this.glpkInstance.GLP_LO, lb: afscInfo.target, ub: Infinity }
             };
+
+            // Set upper bound as the target multiplied by the overclassification factor
+            let constraintUpper = {
+                name: `Target_Upper_${afsc}`,
+                vars: [],
+                bnds: { type: this.glpkInstance.GLP_UP, lb: -Infinity, ub: afscInfo.target * afscInfo.overclassFactor }
+            };
+
+            // Add variables to both constraints
             Object.keys(this.cadetData).forEach(cadet => {
-                constraint.vars.push({ name: `${cadet}_${afsc}`, coef: 1 });
+                constraintLower.vars.push({ name: `${cadet}_${afsc}`, coef: 1 });
+                constraintUpper.vars.push({ name: `${cadet}_${afsc}`, coef: 1 });
             });
-            lp.subjectTo.push(constraint);
+
+            lp.subjectTo.push(constraintLower);
+            lp.subjectTo.push(constraintUpper);
         });
 
         // Constraint: Mandatory education requirement distribution
         Object.keys(this.afscData).forEach(afsc => {
             let afscInfo = this.afscData[afsc];
-            let constraint = {
-                name: `Mandatory_Education_${afsc}`,
+            // Mandatory education lower bound
+            let constraintMandatoryLower = {
+                name: `Mandatory_Education_Lower_${afsc}`,
                 vars: [],
                 bnds: {
                     type: this.glpkInstance.GLP_LO,
                     lb: afscInfo.target * afscInfo.mandatoryDegreeBounds.min,
+                    ub: Infinity
+                }
+            };
+            // Mandatory education upper bound
+            let constraintMandatoryUpper = {
+                name: `Mandatory_Education_Upper_${afsc}`,
+                vars: [],
+                bnds: {
+                    type: this.glpkInstance.GLP_UP,
+                    lb: -Infinity,
                     ub: afscInfo.target * afscInfo.mandatoryDegreeBounds.max
                 }
             };
+            // Add variables for mandatory education
             Object.keys(this.cadetData).forEach(cadet => {
                 let cadetInfo = this.cadetData[cadet];
-                constraint.vars.push({
+                constraintMandatoryLower.vars.push({
+                    name: `${cadet}_${afsc}`,
+                    coef: cadetInfo.cadetDegrees[afsc] === DegreeEnum.MANDATORY ? 1 : 0
+                });
+                constraintMandatoryUpper.vars.push({
                     name: `${cadet}_${afsc}`,
                     coef: cadetInfo.cadetDegrees[afsc] === DegreeEnum.MANDATORY ? 1 : 0
                 });
             });
-            lp.subjectTo.push(constraint);
+            lp.subjectTo.push(constraintMandatoryLower);
+            lp.subjectTo.push(constraintMandatoryUpper);
         });
 
         // Constraint: Balance USAFA cadet distribution
@@ -187,9 +219,8 @@ export class CadetAssignment {
     async Solve() {
         try {
             // Solve the LP problem
-            const result = this.glpkInstance.solve(this.lp, { msglev: this.glpkInstance.GLP_MSG_ALL });
+            const result = await this.glpkInstance.solve(this.lp, { msglev: this.glpkInstance.GLP_MSG_ALL });
     
-            // Check if the result is optimal
             if (result.result.status === this.glpkInstance.GLP_OPT) {
                 console.log('✅ Optimal solution found!');
                 this.DisplayResults(result.result.vars);
