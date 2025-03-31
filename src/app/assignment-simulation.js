@@ -68,6 +68,7 @@ export function AssignmentSimulation({ afscs, cadets }) {
 			glpkInstance
 		);
 		await simulation.Solve();
+		setResults(simulation.results);
 	}
 
 	return (
