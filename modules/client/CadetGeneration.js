@@ -9,7 +9,7 @@ export function GenerateCadets(afscs){
     const cumulativeWeights = createCumulativeWeights(afscs);
     // create cadet and preferences
     let cadetList = [];
-    for (let i = 0; i <= numCadets; ++i){
+    for (let i = 0; i < numCadets; ++i){
         const preferences = generatePreferences(cumulativeWeights);
         const degrees = generateDegrees(preferences);
         const percentile = Math.random().toFixed(3);
@@ -62,7 +62,7 @@ function getCalculatedCadetCount(afscs) {
         maxCadets += Math.ceil(total);
     }
     // Random number between min and max
-    return Math.floor(Math.random() * (maxCadets - minCadets + 1)) + minCadets;
+    return Math.floor(Math.random() * (maxCadets - minCadets)) + minCadets;
 }
 
 // Create cumulative weights for sampling
