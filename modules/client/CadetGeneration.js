@@ -59,11 +59,11 @@ function getCalculatedCadetCount(afscs) {
 	for (let key in afscs) {
 		const afsc = afscs[key];
 		const total = afsc.target * afsc.overclassFactor;
-		minCadets += Math.floor(total);
-		maxCadets += Math.ceil(total);
+		minCadets += Math.floor(afsc.target);
+		maxCadets += Math.floor(total);
 	}
 	// Random number between min and max
-	return Math.floor(Math.random() * (maxCadets - minCadets)) + minCadets;
+	return minCadets;
 }
 
 // Create cumulative weights for sampling
