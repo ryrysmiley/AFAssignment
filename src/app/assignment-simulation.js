@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { CadetAssignment } from "../../modules/client/AssignmentSimulation";
+import { CadetAssignment, RunSimulations } from "../../modules/client/AssignmentSimulation";
 import GLPK from "glpk.js";
 export function AssignmentSimulation({ afscs, cadets }) {
 	const [results, setResults] = useState({});
@@ -99,10 +99,24 @@ export function AssignmentSimulation({ afscs, cadets }) {
 						onClick={() => {
 							RunSimulation();
 						}}
-						disabled={afscs.length === 0 || cadets === 0}
+						disabled={afscs.length === 0 || cadets.length === 0}
 						className="p-2 bg-green-700 text-white rounded-md hover:bg-green-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
 					>
 						Simulate
+					</button>
+				</div>
+				<div className="me-4">
+					<label className="block mb-2 text-sm font-medium text-gray-600">
+						Run multiple simulations
+					</label>
+					<button
+						onClick={() => {
+							RunSimulations(afscs, 2000, glpkInstance);
+						}}
+						disabled={afscs.length === 0}
+						className="p-2 bg-green-700 text-white rounded-md hover:bg-green-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
+					>
+						Run 2000 simulations
 					</button>
 				</div>
 			</div>

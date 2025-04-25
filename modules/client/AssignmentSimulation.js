@@ -1,5 +1,6 @@
 import { DegreeEnum } from '../models/DegreeEnum.js';
 import glpk from 'glpk.js';
+import { GenerateCadets } from './CadetGeneration.js';
 
 // CadetAssignment Class
 export class CadetAssignment {
@@ -240,7 +241,7 @@ export class CadetAssignment {
             Object.keys(this.afscData).forEach(afsc => {
                 let varName = `${cadet}_${afsc}`;
                 if (vars[varName] === 1) {
-                    console.log(`${cadet} assigned to ${afsc}`);
+                    // console.log(`${cadet} assigned to ${afsc}`);
                     if(this.cadetData[cadet].cadetPreferences !== null){
                         if(this.cadetData[cadet].cadetPreferences[afsc])
                         {
@@ -254,13 +255,79 @@ export class CadetAssignment {
                 }
             });
         });
-        console.log('1st preference:', res[1]);
-        console.log('2nd preference:', res[2]);
-        console.log('3rd preference:', res[3]);
-        console.log('4th preference:', res[4]);
-        console.log('5th preference:', res[5]);
-        console.log('6th preference:', res[6]);
-        console.log('Not preferred:', res["Not preferred"]);
+        // console.log('1st preference:', res[1]);
+        // console.log('2nd preference:', res[2]);
+        // console.log('3rd preference:', res[3]);
+        // console.log('4th preference:', res[4]);
+        // console.log('5th preference:', res[5]);
+        // console.log('6th preference:', res[6]);
+        // console.log('Not preferred:', res["Not preferred"]);
         this.results = res;
     }
+}
+
+// Running multiple simulations in parallel to get average results given afscs
+export async function RunSimulations(afscs, numSimulations, glpkInstance) {
+    /* Each simulation gets a new set of cadets based on the afscs */
+    let multipleResults = [];
+
+    // Properly assign afsc data
+    let afscData = {};
+    for (let afsc of afscs) {
+        afscData[afsc.afsc] = afsc;
+    }
+
+    let totalFailed = 0;
+    let totalPassed = 0;
+    // Run multiple simulations
+    for (let i = 0; i < numSimulations; i++) {
+        // Create a new instance of CadetAssignment for each simulation
+        let cadetData = {};
+        const cadets = GenerateCadets(afscs); // Create a new cadet data object for each simulation
+        for (let cadet of cadets) {
+            cadetData[cadet.name] = cadet;
+        }
+        const cadetAssignment = new CadetAssignment(cadetData, afscData, -50000, glpkInstance);
+        await cadetAssignment.Solve();
+        // Check if the simulation was successful
+        if (cadetAssignment.results.length === 0) {
+            totalFailed += 1;
+        } else {
+            totalPassed += 1;
+        }
+        // Store the results of each simulation
+        multipleResults[i] = cadetAssignment.results;
+    }
+    
+    // Calculate average results across all simulations 
+    let averageResults = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, "Not preferred": 0};
+    let averagePercents = {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0, "Not preferred": 0.0};
+
+    for (let i = 0; i < numSimulations; i++) {
+        let total = 0;
+        Object.keys(multipleResults[i]).forEach(key => {
+            total += multipleResults[i][key];
+            averageResults[key] += multipleResults[i][key];
+        });
+
+        // Calculate percentages for each preference
+        Object.keys(multipleResults[i]).forEach(key => {
+            averagePercents[key] += (multipleResults[i][key] / total);
+        });
+    }
+
+    // Divide by the number of simulations to get average
+    Object.keys(averageResults).forEach(key => {
+        averageResults[key] = (averageResults[key] / numSimulations);
+    });
+    // Divide by the total number of cadets to get average percentages
+    Object.keys(averagePercents).forEach(key => {
+        averagePercents[key] = (averagePercents[key] / numSimulations);
+    });
+
+    console.log(`Simulation Ran: ${numSimulations}`);
+    console.log(`Total Passed: ${totalPassed}`);
+    console.log(`Total Failed: ${totalFailed}`);
+    console.log('Average Results:', averageResults);
+    console.log('Average Percentages:', averagePercents);
 }
