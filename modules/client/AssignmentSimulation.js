@@ -267,6 +267,7 @@ export class CadetAssignment {
 }
 
 // Running multiple simulations in parallel to get average results given afscs
+// TODO - Add another stat about what the cadet percentile was and what pref they got (probably write a file with this data)
 export async function RunSimulations(afscs, numSimulations, glpkInstance) {
     /* Each simulation gets a new set of cadets based on the afscs */
     let multipleResults = [];
