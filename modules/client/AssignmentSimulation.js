@@ -1,6 +1,7 @@
 import { DegreeEnum } from '../models/DegreeEnum.js';
 import glpk from 'glpk.js';
 import { GenerateCadets } from './CadetGeneration.js';
+import * as XLSX from "xlsx";
 
 // CadetAssignment Class
 export class CadetAssignment {
@@ -10,6 +11,7 @@ export class CadetAssignment {
         this.afscData = afscHashSet; // all afscs in dictionary
         this.deviationPenalty = deviationPenalty; // penalty for not meeting requirements
         this.results = {};
+        this.afscsResults = {};
         
         // glpk
         if (glpk == null) {
@@ -241,7 +243,12 @@ export class CadetAssignment {
             Object.keys(this.afscData).forEach(afsc => {
                 let varName = `${cadet}_${afsc}`;
                 if (vars[varName] === 1) {
-                    // console.log(`${cadet} assigned to ${afsc}`);
+                    // add cadet to afsc
+                    if(this.afscsResults[afsc] === undefined) {
+                        this.afscsResults[afsc] = [];
+                    }
+                    this.afscsResults[afsc].push(this.cadetData[cadet]);
+
                     if(this.cadetData[cadet].cadetPreferences !== null){
                         if(this.cadetData[cadet].cadetPreferences[afsc])
                         {
@@ -267,10 +274,13 @@ export class CadetAssignment {
 }
 
 // Running multiple simulations in parallel to get average results given afscs
-// TODO - Add another stat about what the cadet percentile was and what pref they got (probably write a file with this data)
+// Add another stat about what the cadet percentile was and what pref they got (probably write a file with this data)
+// average cadet merit in a afsc
+// source of commissioning in an afsc
 export async function RunSimulations(afscs, numSimulations, glpkInstance) {
     /* Each simulation gets a new set of cadets based on the afscs */
     let multipleResults = [];
+    let allAfscsResults = [];
 
     // Properly assign afsc data
     let afscData = {};
@@ -298,14 +308,17 @@ export async function RunSimulations(afscs, numSimulations, glpkInstance) {
         }
         // Store the results of each simulation
         multipleResults[i] = cadetAssignment.results;
+        allAfscsResults.push(cadetAssignment.afscsResults);
     }
     
     // Calculate average results across all simulations 
     let averageResults = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, "Not preferred": 0};
     let averagePercents = {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0, "Not preferred": 0.0};
+    let excelRows = []; // Store all cadet data for excel file
 
     for (let i = 0; i < numSimulations; i++) {
         let total = 0;
+        // Calculate total for each simulation
         Object.keys(multipleResults[i]).forEach(key => {
             total += multipleResults[i][key];
             averageResults[key] += multipleResults[i][key];
@@ -314,6 +327,25 @@ export async function RunSimulations(afscs, numSimulations, glpkInstance) {
         // Calculate percentages for each preference
         Object.keys(multipleResults[i]).forEach(key => {
             averagePercents[key] += (multipleResults[i][key] / total);
+        });
+
+        // Put all details of afscs into excel file with headers Run Number, AFSC, Cadet Name, Cadet Percentile, Cadet Degree, Cadet Preference Ranking
+        Object.keys(allAfscsResults[i]).forEach(afsc => {
+            if (allAfscsResults[i][afsc] !== undefined) {
+                for (let cadet of allAfscsResults[i][afsc]) {
+                    excelRows.push({
+                        "Run Number": i,
+                        "AFSC": afsc,
+                        "Cadet Name": allAfscsResults[i][afsc].name,
+                        "Cadet Percentile": cadet.cadetPercentile,
+                        "Cadet Degree": cadet.cadetDegrees[afsc],
+                        "Cadet Preference Ranking": cadet.cadetPreferences[afsc]
+                    });
+                }
+            }
+            else {
+                console.log(`No cadets assigned to ${afsc} in simulation ${i}`);
+            }
         });
     }
 
@@ -325,6 +357,12 @@ export async function RunSimulations(afscs, numSimulations, glpkInstance) {
     Object.keys(averagePercents).forEach(key => {
         averagePercents[key] = (averagePercents[key] / numSimulations);
     });
+    // Write the excel file with the cadet data
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(excelRows);
+
+    XLSX.utils.book_append_sheet(wb, ws, "Cadet Data");
+    XLSX.writeFile(wb, "CadetData.xlsx");
 
     console.log(`Simulation Ran: ${numSimulations}`);
     console.log(`Total Passed: ${totalPassed}`);
