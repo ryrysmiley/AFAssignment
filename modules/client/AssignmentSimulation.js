@@ -281,6 +281,8 @@ export async function RunSimulations(afscs, numSimulations, glpkInstance) {
     /* Each simulation gets a new set of cadets based on the afscs */
     let multipleResults = [];
     let allAfscsResults = [];
+    let excelRowsCadetData = []; // Store all cadet data for excel file
+    let averagePreferences = {};
 
     // Properly assign afsc data
     let afscData = {};
@@ -295,9 +297,47 @@ export async function RunSimulations(afscs, numSimulations, glpkInstance) {
         // Create a new instance of CadetAssignment for each simulation
         let cadetData = {};
         const cadets = GenerateCadets(afscs); // Create a new cadet data object for each simulation
+        // store cadet data for excel file with headers Name, Percentile, Degree, Preference Ranking
+        excelRowsCadetData = cadets.map((cadet) => {
+            const prefReorder = {};
+            Object.entries(cadet.cadetPreferences).forEach(([key, value]) => {
+                prefReorder[value] = key;
+            });
+
+            return {
+                name: cadet.name,
+                p1: prefReorder[1] || "",
+                p2: prefReorder[2] || "",
+                p3: prefReorder[3] || "",
+                p4: prefReorder[4] || "",
+                p5: prefReorder[5] || "",
+                p6: prefReorder[6] || "",
+                percentile: cadet.cadetPercentile,
+                usafa_origin: cadet.cadetFromUSAFA ? "TRUE" : "FALSE",
+                mandatory_degree: Object.entries(cadet.cadetDegrees)
+                    .filter(([_, value]) => value === DegreeEnum.MANDATORY)
+                    .map(([key]) => key).join("|"),
+                desired_degree: Object.entries(cadet.cadetDegrees)
+                    .filter(([_, value]) => value === DegreeEnum.DESIRED)
+                    .map(([key]) => key).join("|"),
+                permitted_degree: Object.entries(cadet.cadetDegrees)
+                    .filter(([_, value]) => value === DegreeEnum.PERMITTED)
+                    .map(([key]) => key).join("|")
+            };
+        });
+
         for (let cadet of cadets) {
             cadetData[cadet.name] = cadet;
+            const preferences = cadet.cadetPreferences;
+			for (let afsc in preferences) {
+				if (averagePreferences[afsc]) {
+					averagePreferences[afsc]++; // Increment count if AFSC already exists
+				} else {
+					averagePreferences[afsc] = 1; // Initialize count if it's the first occurrence
+				}
+			}
         }
+
         const cadetAssignment = new CadetAssignment(cadetData, afscData, -50000, glpkInstance);
         await cadetAssignment.Solve();
         // Check if the simulation was successful
@@ -314,7 +354,7 @@ export async function RunSimulations(afscs, numSimulations, glpkInstance) {
     // Calculate average results across all simulations 
     let averageResults = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, "Not preferred": 0};
     let averagePercents = {1: 0.0, 2: 0.0, 3: 0.0, 4: 0.0, 5: 0.0, 6: 0.0, "Not preferred": 0.0};
-    let excelRows = []; // Store all cadet data for excel file
+    let excelRowsAfscCadetMatch = []; // Store all cadet data for excel file
 
     for (let i = 0; i < numSimulations; i++) {
         let total = 0;
@@ -333,8 +373,8 @@ export async function RunSimulations(afscs, numSimulations, glpkInstance) {
         Object.keys(allAfscsResults[i]).forEach(afsc => {
             if (allAfscsResults[i][afsc] !== undefined) {
                 for (let cadet of allAfscsResults[i][afsc]) {
-                    excelRows.push({
-                        "Run Number": i,
+                    excelRowsAfscCadetMatch.push({
+                        "Run Number": i + 1,
                         "AFSC": afsc,
                         "Cadet Name": allAfscsResults[i][afsc].name,
                         "Cadet Percentile": cadet.cadetPercentile,
@@ -359,14 +399,20 @@ export async function RunSimulations(afscs, numSimulations, glpkInstance) {
     });
     // Write the excel file with the cadet data
     const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.json_to_sheet(excelRows);
-
-    XLSX.utils.book_append_sheet(wb, ws, "Cadet Data");
-    XLSX.writeFile(wb, "CadetData.xlsx");
+    const ws = XLSX.utils.json_to_sheet(excelRowsAfscCadetMatch);
+    XLSX.utils.book_append_sheet(wb, ws, "AFSC Cadet Match");
+    // Write the excel file with the cadet data summary
+    const wsCadetData = XLSX.utils.json_to_sheet(excelRowsCadetData);
+    XLSX.utils.book_append_sheet(wb, wsCadetData, "Cadet Data Summary");
+    // Write the excel file with the average results by converting object with afscs and their counts
+    const wsAverageResults = XLSX.utils.json_to_sheet([averagePreferences]);
+    XLSX.utils.book_append_sheet(wb, wsAverageResults, "Average Results");
+    XLSX.writeFile(wb, "CadetAssignmentResults.xlsx");
 
     console.log(`Simulation Ran: ${numSimulations}`);
     console.log(`Total Passed: ${totalPassed}`);
     console.log(`Total Failed: ${totalFailed}`);
     console.log('Average Results:', averageResults);
     console.log('Average Percentages:', averagePercents);
+    console.log('Average Preferences:', averagePreferences);
 }
